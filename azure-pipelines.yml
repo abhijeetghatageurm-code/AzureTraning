@@ -17,3 +17,15 @@ steps:
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
   displayName: 'Run a multi-line script'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    azureSubscription: 'WP_Subscription_0185(df43b0ba-309f-4017-b532-1eb014fce3c8)'
+    command: 'build'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    azureSubscription: 'WP_Subscription_0185(df43b0ba-309f-4017-b532-1eb014fce3c8)'
+    command: 'run'
+
+
