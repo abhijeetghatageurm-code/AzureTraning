@@ -9,23 +9,58 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:  
+  buildConfiguration: 'Release'
+
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+  
+  #install .net SDK
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
-
-- task: DotNetCoreCLI@2
+- task: UseDotNet@2
+  displayName: 'Install .net SDK'
   inputs:
-    azureSubscription: 'WP_Subscription_0185(df43b0ba-309f-4017-b532-1eb014fce3c8)'
-    command: 'build'
-
+     packageType: 'sdk'
+     version: '8.0.x'
+     
+#restore NuGet Pckages
 - task: DotNetCoreCLI@2
+  displayName: 'Restore Packages'
   inputs:
-    azureSubscription: 'WP_Subscription_0185(df43b0ba-309f-4017-b532-1eb014fce3c8)'
-    command: 'run'
+    command: restore
+    projects: '**/*.csproj'
 
+#Build Solution
+- task: DotNetCoreCLI@2
+  displayName: 'Build solution'
+  inputs:
+    command: build
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-restore'
+
+#run unit tests
+- task: DotNetCoreCLI@2
+  displayName: 'Run Test'
+  inputs:
+    command: test
+    projects: '**/*Test.csproj'
+    arguments:  '--configuration $(buildConfiguration) --no-build'
+    publishTestResults: true
+
+#publish web api
+- task: DotNetCoreCLI@2
+  displayName: 'Publish web api'
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: true
+
+#publish art
+- task: PublishBuildArtifacts@1
+  displayName: 'Publsih Artifiacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: FilePath
 
