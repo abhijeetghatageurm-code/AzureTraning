@@ -1,0 +1,75 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+    buildConfiguration: 'Release'
+
+stages:
+
+#------------- Build stage -----------
+
+  - stage: Build
+    displayName: Build Application 
+
+    jobs:
+      - job: BuildJob
+
+        steps:
+        
+        # Install SDK
+        - task: UseDotNet@2
+          displayName: Install SDK
+          inputs:
+            packageType: sdk
+            version: 9.0.x
+
+        # install NuGet
+        - task: DotNetCoreCLI@2
+          displayName: Rstore
+          inputs:
+           command : restore
+           projects: '**/*.csproj'
+
+        # Building Solution
+        - task : DotNetCoreCLI@2
+          displayName: Build Solution
+          inputs:
+            command : build
+            projects: '**/*.csproj'
+            arguments: '--configuration $(buildConfiguration) --no-restore'
+
+        # running Test
+        - task: DotNetCoreCLI@2
+          displayName: Run Test
+          inputs:
+            command: test
+            projects: '**/*Test.csproj'
+            arguments: '--configuration $(buildConfiguration) --no-build'
+            publishTestResults: true
+
+        # Publishing Web API
+        - task: DotNetCoreCLI@2
+          displayName: Publish Web Api
+          inputs:
+            command: publish
+            publishWebProjects: false
+            projects: '**/*API.csproj'
+            arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+            zipAfterPublish: true   
+        
+        # Publishing Artifact
+        - task: PublishBuildArtifacts@1
+          displayName: Publish Artifact 
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+            ArtifactName: 'drop'
+            publishLocation: Container
+               
