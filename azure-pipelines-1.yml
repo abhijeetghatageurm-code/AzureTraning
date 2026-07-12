@@ -104,3 +104,29 @@ stages:
                    package: '$(Pipeline.Workspace)/drop/webapp/*.zip'
 
               
+# Prod Deployment
+  - stage: Prod_Deployment
+    displayName: Deploy to Prod
+    dependsOn: QA_Deployment
+
+    jobs:
+      - deployment: Prod_Deployment
+        environment: Production
+
+        strategy:
+           runOnce:
+             deploy:
+               steps:
+                 - download: current
+                   artifact: drop
+
+                 - task: AzureWebApp@1  
+                   inputs:
+                     azureSubscription: 'WP_Subscription_0185(df43b0ba-309f-4017-b532-1eb014fce3c8)'
+                     appType : webApp
+                     appName: 'MyAzureDevOps'
+
+                     deployToSlotOrASE: true
+                     resourceGroupName: 'VisualStudioOnline-C4E0F211863047BB91FF32A55AE5680E' 
+                     slotName: Production
+                     package: '$(Pipeline.Workspace)/drop/webapp/*.zip'
