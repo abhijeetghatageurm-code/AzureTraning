@@ -73,3 +73,32 @@ stages:
             ArtifactName: 'drop'
             publishLocation: Container
                
+
+# QA DEPLOYMENT
+  - stage: QA_Deployment
+    displayName: Deplyeing to QA
+    dependsOn: Build
+
+    jobs:
+      - deployment: QA_Deployement
+        environment: QA
+
+        strategy:
+         runOnce:
+           deploy:
+             steps:
+               - download: current
+                 artifact: drop
+               - task: AzureWebApp@1
+                 inputs:
+                   azureSubscription: 'WP_Subscription_0185(df43b0ba-309f-4017-b532-1eb014fce3c8)'
+                   appType : webApp
+                   appName: 'MyAzureDevOps'
+
+                   deployToSlotOrASE: true
+                   resourceGroupName: 'WP_SL_User_177'
+                   slotName: 'staging-qa'
+                   package: '$(Pipeline.Workspace)/drop/**/*.zip'
+
+
+              
