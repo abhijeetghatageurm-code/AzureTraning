@@ -97,7 +97,8 @@ stages:
                    appName: 'MyAzureDevOps'
 
                    deployToSlotOrASE: true
-                   resourceGroupName: 'WP_SL_User_177'
+                  #  resourceGroupName: 'WP_SL_User_177'
+                   resourceGroupName: 'VisualStudioOnline-C4E0F211863047BB91FF32A55AE5680E'
                    slotName: 'staging-qa'
                   #  package: '$(Pipeline.Workspace)/drop/**/*.zip'
                    package: '$(Pipeline.Workspace)/drop/webapp/*.zip'
