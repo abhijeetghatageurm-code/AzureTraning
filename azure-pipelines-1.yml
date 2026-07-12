@@ -62,7 +62,8 @@ stages:
             command: publish
             publishWebProjects: false
             projects: '**/*.csproj'
-            arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+            #arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+            arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/webapp'
             zipAfterPublish: true   
         
         # Publishing Artifact
@@ -98,7 +99,7 @@ stages:
                    deployToSlotOrASE: true
                    resourceGroupName: 'WP_SL_User_177'
                    slotName: 'staging-qa'
-                   package: '$(Pipeline.Workspace)/drop/**/*.zip'
-
+                  #  package: '$(Pipeline.Workspace)/drop/**/*.zip'
+                   package: '$(Pipeline.Workspace)/drop/webapp/*.zip'
 
               
